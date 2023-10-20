@@ -93,6 +93,16 @@ def filter_df(start_date, selected_date, category_value):
     # Display the total volume and value sales at the manufacturer level
     manufacturer_sales = filtered_df.groupby('Manufacturer')[['Volume', 'Value']].sum().sort_values(by='Value', ascending=False)
     
+    # Calculate market share based on value
+    total_value = manufacturer_sales['Value'].sum()
+    manufacturer_sales['Market Share'] = (manufacturer_sales['Value'] / total_value) * 100
+    manufacturer_sales.rename(columns={"Volume":"Total Sales Volume","Value":"Total Sales Value"}, inplace=True)
+    manufacturer_sales = manufacturer_sales.style.format({
+        'Total Sales Volume': '{:,.0f}',
+        'Total Sales Value': '{:,.0f}',
+        'Total Market Share': '{:.2f}%'
+    })
+
     st.dataframe(manufacturer_sales, width=800)
     st.markdown("---")
     return manufacturer_sales, filtered_df
